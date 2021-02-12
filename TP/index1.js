@@ -1,5 +1,7 @@
-// Import a module
+// Import modules
 const http = require('http');
+const url = require('url');
+
 
 const content = '<!DOCTYPE html>' +
 '<html>' +
@@ -8,11 +10,15 @@ const content = '<!DOCTYPE html>' +
 '        <title>ECE AST</title>' +
 '    </head>' + 
 '    <body>' +
-'       <p>Hello World !</p>' +
+'       <p>Hello World ! :)</p>' +
 '    </body>' +
 '</html>';
 
 const serverHandle = function (req, res) {
+  // Retrieve and print the current path
+  const path = url.parse(req.url).pathname;
+  console.log(path);
+
   res.writeHead(200, {'Content-Type': 'text/html'});
   res.write(content);
   res.end();
