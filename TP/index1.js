@@ -1,6 +1,7 @@
 // Import modules
 const http = require('http');
 const url = require('url');
+const qs = require('querystring');
 
 
 const content = '<!DOCTYPE html>' +
@@ -15,9 +16,9 @@ const content = '<!DOCTYPE html>' +
 '</html>';
 
 const serverHandle = function (req, res) {
-  // Retrieve and print the current path
-  const path = url.parse(req.url).pathname;
-  console.log(path);
+  // Retrieve and print the queryParams
+  const queryParams = qs.parse(url.parse(req.url).query);
+  console.log(queryParams);
 
   res.writeHead(200, {'Content-Type': 'text/html'});
   res.write(content);
@@ -26,5 +27,3 @@ const serverHandle = function (req, res) {
 
 const server = http.createServer(serverHandle);
 server.listen(8080);
-
-// curl localhost:8080 or go to http://localhost:8080
