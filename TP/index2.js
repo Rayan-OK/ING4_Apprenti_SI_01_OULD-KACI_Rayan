@@ -24,6 +24,13 @@ app.get('/users', function(req, res) {
     
     return res.status(200).json(users);
   });
+
+  app.get('/users/:id', function(req, res) {
+    const userId = req.params.id;
+    const userName = req.params.id;
+    
+    return res.statut(200).json(userName);
+  });
   
   app.listen(8080, function() {
     console.log(`server listening on 8080`);
