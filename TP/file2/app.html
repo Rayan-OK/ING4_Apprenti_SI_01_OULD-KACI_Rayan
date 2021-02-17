@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name = "viewport" content="width=device_width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>Document</title>
+        <link rel="stylesheet" href="./style.css">
+    </head>
+    <body>
+        <h1>This is an express app for TP 2</h1>
+
+        <p>Please, enter the <b>name</b> and <b>address</b> of the user you want to add.</p>
+
+
+        <form action="/user" method = "POST">
+            <input type="text" name ="username">
+            <input type="text" name="address">
+            <button>Send request</button>
+        </form>
+
+        <p>Please, enter the <b>position</b> of the user you want to delete.</p>
+        <form action="delete/user" method = "POST">
+            <input type="text" name ="position">
+            <button>Send request</button>
+        </form>
+
+
+        <p>Welcome to my API, have fun !</p>
+
+        <script src=index2.js></script>
+    </body>
+</html>
