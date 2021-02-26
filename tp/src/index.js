@@ -61,9 +61,9 @@ constructor(props){
         const winner = calculateWinner(this.state.squares);
         let status;
         if (winner){
-            status = winner + 'a gagné';
+            status = winner + ' a gagné !';
         } else {
-        const status = 'Next player: ' +
+            status = 'Next player: ' +
         (this.state.xIsNext ? 'X' : 'O');
         }
   
