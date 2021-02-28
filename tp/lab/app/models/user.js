@@ -26,7 +26,7 @@ const listAllUsers = async () => {
 };
 
 const createNewUser = body => {
-    if(!body.name) {
+    if(!body.name && !body.email && !body.password) {
         return null //ne pas oublier les blindages !
     }
 
@@ -39,8 +39,6 @@ const createNewUser = body => {
     };
 
     return new Promise(((resolve, reject) => {
-        //https://github.com/Level/level#put
-        // on insère en base de données
         db.put(`users:${user.id}`, JSON.stringify(user), (err) => {
             if(err) {
                 //TODO blindage erreur
@@ -52,10 +50,11 @@ const createNewUser = body => {
     }));
 };
 
-const showUser = userId => {
+const showUser = async (userId) => {
     //on a un code asynchrone, on va donc utiliser les promesses pour nous simplifier la vie...
     //https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Objets_globaux/Promise
     //https://developer.mozilla.org/fr/docs/Web/JavaScript/Guide/Utiliser_les_promesses
+    
     return new Promise(((resolve, reject) => {
         db.get(`users:${userId}`, (err, value) => {
             if(err) {
@@ -68,41 +67,33 @@ const showUser = userId => {
     }));
 };
 
-const updateUser = async (userId, body) => {  
-    if(!userId || !body.name){
-        return null;
-    } 
-    const user = {
-        id: userId,
-        name: body.name,
-        email: body.email,
-        password: body.password,
-    };
+const updateUser = async (userId, body) => {
+    try {
+        const data = await db.get(`users:${userId}`);
+        const original = JSON.parse(data);
+        user = merge(original, user);
+        await db.put(`users:${userId}`, JSON.stringify(user));
+        return merge(user, { id: userId });
 
-    return new Promise(((resolve, reject) => {
-        db.put(`users:${userId}` ,JSON.stringify(user), (err) => {
-            if(err) {
-                return(resolve());
-            }
-            resolve(user);//On a "jsonifié" notre channel lorsque on l'a créé ligne 24. Il faut faire l'opération inverse
-        });
-    }));
-};
-
-const deleteUser = async userId => {
-    if(!userId){
-        return null;
+    } catch (e) {
+        return e.message;
     }
 
-    return new Promise(((resolve, reject) => {
-        db.del(`users:${userId}`, (err) => {
-            if(err) {
-                //TODO blindage erreur
-                reject(err);
-            }
-            resolve();//On a "jsonifié" notre user lorsque on l'a créé ligne 24. Il faut faire l'opération inverse
-        });
-    }));
+    
+};
+
+const deleteUser = async (userId) => {
+    try {
+        const data = await db.get(`users:${userId}`);
+        const original = JSON.parse(data);
+        await db.del(`users:${userId}`);
+        return merge(original, { delete: 'OK' });
+
+    } catch (e) {
+        return e.message;
+    }
+    
+
 };
 
 module.exports = {

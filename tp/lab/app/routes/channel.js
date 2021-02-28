@@ -6,7 +6,6 @@ const channelController = require('../controllers/channel');
 router.get('/', channelController.index);
 router.post('/', channelController.create);
 router.get('/:channelId', channelController.show);
-router.get('/:channelId/message', channelController.showMessages);
 router.put('/:channelId', channelController.update);
 router.delete('/:channelId', channelController.delete);
 

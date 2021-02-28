@@ -1,5 +1,6 @@
 const {v4: uuid} = require('uuid');
 const db = require('../../db_config');
+const {clone, merge} = require('mixme')
 
 const listAllChannels = async () => {
     return new Promise((resolve, reject) => {
@@ -39,6 +40,7 @@ const createNewChannel = body => {
     return new Promise(((resolve, reject) => {
         //https://github.com/Level/level#put
         // on insère en base de données
+        
         db.put(`channels:${channel.id}`, JSON.stringify(channel), (err) => {
             if(err) {
                 //TODO blindage erreur
@@ -50,10 +52,11 @@ const createNewChannel = body => {
     }));
 };
 
-const showChannel = channelId => {
+const showChannel = async (channelId) => {
     //on a un code asynchrone, on va donc utiliser les promesses pour nous simplifier la vie...
     //https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Objets_globaux/Promise
     //https://developer.mozilla.org/fr/docs/Web/JavaScript/Guide/Utiliser_les_promesses
+    
     return new Promise(((resolve, reject) => {
         db.get(`channels:${channelId}`, (err, value) => {
             if(err) {
@@ -66,39 +69,42 @@ const showChannel = channelId => {
     }));
 };
 
-const updateChannel = async (channelId, body) => {  
-    if(!channelId || !body.name){
-        return null;
-    } 
-    const channel = {
-        id: channelId,
-        name: body.name,
-    };
 
-    return new Promise(((resolve, reject) => {
-        db.put(`channels:${channelId}` ,JSON.stringify(channel), (err) => {
-            if(err) {
-                return(resolve());
-            }
-            resolve(channel);//On a "jsonifié" notre channel lorsque on l'a créé ligne 24. Il faut faire l'opération inverse
-        });
-    }));
-};
+const updateChannel = async (req, res) => {
+    try {
+        if (!channelId) {
+            throw Error('Invalid Channel');
+        }
 
-const deleteChannel = async channelId => {
-    if(!channelId){
-        return null;
+        const data = await db.get(`channels:${channelId}`);
+        const original = JSON.parse(data);
+        channel = merge(original, channel);
+        await db.put(`channels:${channelId}`, JSON.stringify(channel));
+        return merge(channel, { id: channelId });
+
+    } catch (e) {
+        return e.message;
     }
 
-    return new Promise(((resolve, reject) => {
-        db.del(`channels:${channelId}`, (err) => {
-            if(err) {
-                //TODO blindage erreur
-                reject(err);
-            }
-            resolve();//On a "jsonifié" notre channel lorsque on l'a créé ligne 24. Il faut faire l'opération inverse
-        });
-    }));
+};
+
+const deleteChannel = async (channelId) => {
+   
+    try {
+        const data = await db.get(`channels:${channelId}`);
+        const original = JSON.parse(data);
+
+        if (!original) {
+            throw Error('Unregistered channel id');
+        }
+
+        await db.del(`channels:${channelId}`);
+        return merge(original, { delete: 'OK' });
+
+    } catch (e) {
+        return e.message;
+    }
+
 };
 
 module.exports = {
